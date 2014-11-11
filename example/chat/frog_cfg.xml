@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<frog>
+  <consoleport>7777</consoleport>
+  <name>chat</name>
+  <srvtype>2</srvtype>
+  <proxy>
+      <ip>127.0.0.1</ip>
+      <port>8888</port>
+  </proxy>
+</frog>

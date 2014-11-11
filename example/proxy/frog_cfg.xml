@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<frog>
+  <port>8888</port>
+  <consoleport>9999</consoleport>
+  <name>proxy</name>
+  <commands>
+      <cmd srvtype='2' tag='user_to_chat' min='1001' max='2000' />
+      <cmd srvtype='3' tag='user_to_mail' min='2001' max='3000' />
+  </commands>
+</frog>
