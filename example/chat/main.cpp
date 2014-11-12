@@ -13,10 +13,15 @@
 #include "console_server_handler.h"
 #include "utils/global_holder.h"
 #include "logger.h"
+#include "pid_file.h"
+#include "timer.h"
+#include "time_utils.h"
 
 int main()
 {
     using namespace frog::chat;
+    
+    frog::utils::create_pid_file();
     
     if (!frog::utils::logger::ref().init("chat", "./"))
     {
@@ -43,13 +48,13 @@ int main()
         proxyclient.connect(config::ref().get_proxy_ip().c_str(),
                             config::ref().get_proxy_port_str().c_str());
         
-		frog::generic::tcpserver consoleserver(io_service,
+	frog::generic::tcpserver consoleserver(io_service,
                                                config::ref().get_console_port(),
                                                frog::generic::parse_line);
         frog::console::console_server_handler consolehandler;
         consolehandler.installcb(consoleserver);
         consoleserver.run();
-        
+
         io_service.run();
     }
     catch (std::exception& e)
