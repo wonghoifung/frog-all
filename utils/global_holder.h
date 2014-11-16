@@ -41,4 +41,7 @@ namespace frog
     }
 }
 
+#define global_dboperator frog::utils::global_holder<frog::db::dboperator>::ref()
+#define global_io_service frog::utils::global_holder<boost::asio::io_service>::ref()
+
 #endif

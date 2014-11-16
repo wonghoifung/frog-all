@@ -47,7 +47,7 @@ int main()
         pshandler.installcb(pserver);
         pserver.run();
         
-		frog::generic::tcpserver consoleserver(io_service,
+	frog::generic::tcpserver consoleserver(io_service,
                                                config::ref().get_console_port(),
                                                frog::generic::parse_line);
         frog::console::console_server_handler chandler;

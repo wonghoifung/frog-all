@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<frog>
+  <consoleport>5555</consoleport>
+  <name>mail</name>
+  <srvtype>3</srvtype>
+  <proxy>
+      <ip>127.0.0.1</ip>
+      <port>8888</port>
+  </proxy>
+  <db>
+      <type>0</type>
+      <ip>127.0.0.1</ip>
+      <port>3388</port>
+      <usr>root</usr>
+      <pwd>123123</pwd>
+      <defaultdb>configs</defaultdb>
+  </db>
+  <mailtable>
+      <db>mails</db>
+      <name>mail</name>
+      <count>10</count>
+  </mailtable>
+</frog>

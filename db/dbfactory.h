@@ -12,10 +12,26 @@ namespace frog
 
         enum dbtype
         {
-            e_mysql,
-            e_postgre,
-            e_oracle,
+            e_mysql = 0,
+            e_postgre = 1,
+            e_oracle = 2,
+            e_unknown = 3,
         };
+        
+        inline dbtype dbtype_cast(int type)
+        {
+            switch (type) {
+                case e_mysql:
+                    return e_mysql;
+                case e_postgre:
+                    return e_postgre;
+                case e_oracle:
+                    return e_oracle;
+                default:
+                    break;
+            }
+            return e_unknown;
+        }
         
 		namespace dbfactory
 		{
