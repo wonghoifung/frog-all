@@ -82,7 +82,7 @@ namespace frog
 
 		const std::string& dataset::get_field(unsigned long rowidx, const std::string &fieldname)
 		{
-			int columnidx = get_field_index_by_name(fieldname);
+			unsigned int columnidx = get_field_index_by_name(fieldname);
 			if(columnidx >= null_columnidx) { return null_string; }
 			return get_field(rowidx, columnidx);
 		}
