@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<frog>
+  <port>8888</port>
+  <consoleport>9999</consoleport>
+  <name>frog_server</name>
+  <urls size='3'>
+    <url>https://github.com/wonghoifung/frog.git</url>
+    <url>https://github.com/wonghoifung/frog-db-wrapper.git</url>
+    <url>https://github.com/wonghoifung/frog-utils.git</url>
+  </urls>
+</frog>
