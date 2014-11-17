@@ -55,6 +55,7 @@ quick glance(full source code could be found in unittest folder)
         
             /* init the console server for afterwards inspection */
             frog::generic::tcpserver consoleserver(io_service, 9877, frog::generic::parse_line);
+            /* FIXME use different handler class */
             frog::generic::generic_server_handler consolehandler;
             consolehandler.installcb(consoleserver);
             consoleserver.run();
@@ -80,15 +81,15 @@ $ telnet 127.0.0.1 9877
 frog-all location on my linux
 ==============================
 
-[AlbertHuang@local170 frog-all]$ ll ..
+[wonghoifung@local100 frog-all]$ ll ..
 
 total 122652
 
-drwxrwxr-x 11 AlbertHuang devel     4096 Oct 15 11:42 boost_1_53_0
+drwxrwxr-x 11 wonghoifung devel     4096 Oct 15 11:42 boost_1_53_0
 
-drwxrwxr-x 10 AlbertHuang devel     4096 Nov 17 17:44 frog-all
+drwxrwxr-x 10 wonghoifung devel     4096 Nov 17 17:44 frog-all
 
-drwxrwxr-x  5 AlbertHuang devel     4096 Nov 10 10:39 mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit
+drwxrwxr-x  5 wonghoifung devel     4096 Nov 10 10:39 mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit
 
-drwxrwxr-x 10 AlbertHuang devel     4096 Nov 10 11:07 postgresql-9.3.5
+drwxrwxr-x 10 wonghoifung devel     4096 Nov 10 11:07 postgresql-9.3.5
 
