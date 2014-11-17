@@ -17,8 +17,8 @@ frog-all was inspired by my work experiences, as a server programmer, I was alwa
 
 Stress test case for the example server can be found in frog-erlang repos. Erlang is suitable to do stress testing because it can spawn thousands of processes easily and cost very little resouce.
 
-quick glance(full source code could be found in example folder)
-===============================================================
+quick glance(full source code could be found in unittest folder)
+================================================================
 
         class generic_server_handler : public boost::noncopyable
         {
