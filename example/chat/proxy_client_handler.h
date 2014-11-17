@@ -48,10 +48,13 @@ namespace frog
             void on_close(frog::generic::tcpsession_ptr session);
             void on_connect(frog::generic::tcpsession_ptr session);
             void on_error(frog::generic::tcpsession_ptr session, int errcode);
-            
+           
+	    void send(frog::generic::encoder* pack);
+ 
         private:
             chat_manager mgr_;
             chat_stat stat_;
+	    frog::generic::tcpsession_ptr session_;
         };
         
     }

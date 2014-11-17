@@ -25,11 +25,5 @@ enum
     cmd_user_mail_alert = 2005,
 };
 
-struct user
-{
-    int id;
-};
-#define global_user frog::utils::global_holder<user>::ref() 
-
 #endif
 

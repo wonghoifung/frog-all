@@ -27,6 +27,7 @@ namespace frog
             console_server_handler();
             void lcmd_console_stat(std::vector<std::string>&,generic::tcpsession_ptr session);
             void lcmd_console_clear(std::vector<std::string>&,generic::tcpsession_ptr);
+            void lcmd_server_broadcast(std::vector<std::string>&,generic::tcpsession_ptr);
             void installcb(generic::tcpserver& s);
             void on_close(frog::generic::tcpsession_ptr session);
             void on_connect(frog::generic::tcpsession_ptr session);

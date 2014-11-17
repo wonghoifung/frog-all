@@ -19,10 +19,6 @@ int main(int argc, char* argv[])
         chandler.installcb(consoleserver);
         consoleserver.run();
 	
-	user gu;
-	global_user.set(&gu);
-	global_user.get().id = 1;
-
         io_service.run();
     }
     catch (std::exception& e)

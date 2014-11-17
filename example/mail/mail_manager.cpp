@@ -13,7 +13,6 @@
 #include "mail_command.h"
 #include "memcached_manager.h"
 #include <boost/property_tree/ptree.hpp>
-#include <boost/property_tree/xml_parser.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/typeof/typeof.hpp>
 #include <boost/foreach.hpp>
@@ -80,7 +79,7 @@ namespace frog
 		op.write_int(userid);
                 op.write_short(0); /* success */
                 op.write_int((int)(mbriefs.size()));
-                for (int i=0; i<mbriefs.size(); ++i)
+                for (std::vector<mail_brief>::size_type i=0; i<mbriefs.size(); ++i)
                 {
                     op.write_int(mbriefs[i].mailid);
                     op.write_int(mbriefs[i].from);
@@ -244,7 +243,7 @@ namespace frog
                 std::vector<mail_brief> mbriefs;
                 if (get_all_mail_brief_from_cache(userid, mbriefs))
                 {
-                    for (int i=0; i<mbriefs.size(); ++i)
+                    for (std::vector<mail_brief>::size_type i=0; i<mbriefs.size(); ++i)
                     {
                         if (mbriefs[i].mailid == mailid)
                         {
@@ -296,7 +295,7 @@ namespace frog
                 ptree pt;
                 try
                 {
-                    read_json(ss, pt);
+                    json_parser::read_json(ss, pt);
                     BOOST_FOREACH(boost::property_tree::ptree::value_type& v, pt)
                     {
                         mail_brief mbrief;
@@ -325,7 +324,7 @@ namespace frog
             try
             {
                 ptree array;
-                for (int i=0; i<mailbriefs.size(); ++i)
+                for (std::vector<mail_brief>::size_type i=0; i<mailbriefs.size(); ++i)
                 {
                     ptree node;
                     node.put("id", mailbriefs[i].mailid);
@@ -338,9 +337,12 @@ namespace frog
                 }
                 
                 int cache_tag = global_hash_tag.get().get_tag(userid);
-                std::stringstream key; key << key_all_mail_brief << userid;
-                std::stringstream value;
-                write_json(value, array);
+                std::ostringstream key; key << key_all_mail_brief << userid;
+                std::ostringstream value;
+
+		// see https://svn.boost.org/trac/boost/ticket/5598
+		// about how to silience the useless warning for this call 
+                json_parser::write_json(value, array);
                 
                 if (frog::cache::memcached_manager::ref().set(cache_tag, key.str(), value.str(), 0))
                 {
@@ -369,7 +371,7 @@ namespace frog
                 return false;
             }
             
-            for (int i=0; i<ds->row_count(); ++i)
+            for (unsigned long i=0; i<ds->row_count(); ++i)
             {
                 mail_brief mbrief;
                 mbrief.mailid = ds->get_field_int32(i, "id");

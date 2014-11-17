@@ -9,10 +9,12 @@
 #ifndef console_server_handler_header
 #define console_server_handler_header
 
+#include <map>
 #include <cstdlib>
 #include <iostream>
 #include <boost/bind.hpp>
 #include <boost/asio.hpp>
+#include <boost/shared_ptr.hpp>
 #include <boost/noncopyable.hpp>
 #include "generic/tcpserver.h"
 #include "proxy_client_handler.h"
@@ -24,12 +26,23 @@ namespace frog
         
         class console_server_handler : public boost::noncopyable
         {
+	    typedef boost::shared_ptr<frog::generic::tcpclient> tcpclient_ptr; 
+	    typedef boost::shared_ptr<frog::generic::proxy_client_handler> clienthandler_ptr;
+
+	    struct user
+	    {
+    		int id;
+		tcpclient_ptr tcpclient;
+		clienthandler_ptr clienthandler;
+	    };
+
         public:
             console_server_handler();
             void lcmd_console_stat(std::vector<std::string>&,generic::tcpsession_ptr session);
             void lcmd_console_clear(std::vector<std::string>&,generic::tcpsession_ptr);
 
-            void lcmd_setuid(std::vector<std::string>&,generic::tcpsession_ptr);
+            void lcmd_adduser(std::vector<std::string>&,generic::tcpsession_ptr);
+            void lcmd_deluser(std::vector<std::string>&,generic::tcpsession_ptr);
             void lcmd_register(std::vector<std::string>&,generic::tcpsession_ptr);
             void lcmd_connectproxy(std::vector<std::string>&,generic::tcpsession_ptr);
             void lcmd_chatbroadcast(std::vector<std::string>&,generic::tcpsession_ptr);
@@ -48,17 +61,16 @@ namespace frog
             
         private:
             void clear_stat();
+	    user* get_user(int userid);
             
         private:
-	    frog::generic::tcpclient tcpclient_;
-            frog::generic::proxy_client_handler clienthandler_;
+	    std::map<int,user> users_;
+	    generic::tcpsession_ptr linesession_;
 
             int conncount_;
             int closecount_;
             int timeoutcount_;
             int errorcount_;
-
-	    generic::tcpsession_ptr linesession_;
         };
         
     }

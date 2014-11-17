@@ -44,6 +44,7 @@ int main()
         
         frog::generic::tcpclient proxyclient(io_service);
         frog::chat::proxy_client_handler proxyclienthandler;
+        frog::utils::global_holder<frog::chat::proxy_client_handler>::ref().set(&proxyclienthandler);
         proxyclienthandler.installcb(proxyclient);
         proxyclient.connect(config::ref().get_proxy_ip().c_str(),
                             config::ref().get_proxy_port_str().c_str());

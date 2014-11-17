@@ -33,7 +33,7 @@ namespace frog
         class proxy_client_handler : boost::noncopyable
         {
         public:
-	    proxy_client_handler();
+	    proxy_client_handler(int userid);
 	    void set_console(console::console_server_handler* con) {console_ = con;}
 	    bool is_connected() {return connected_;}
 	    frog::generic::tcpsession_ptr session() {assert(session_); return session_;}
@@ -64,6 +64,7 @@ namespace frog
 	    void clear_connect_state();
 
 	private:
+	    int userid_;
 	    bool connected_;
 	    frog::generic::tcpsession_ptr session_;
 	    bool registered_;

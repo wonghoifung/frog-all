@@ -46,7 +46,7 @@ int main()
     /* cache */
     frog::utils::hash_tag hashtag;
     frog::db::dataset* ds = db.query("select * from configs.memcached_address;");
-    for (int i=0; i<ds->row_count(); ++i)
+    for (unsigned long i=0; i<ds->row_count(); ++i)
     {
         int tag = ds->get_field_int32(i, "cache_tag");
         std::string ip = ds->get_field_string(i, "cache_ip");

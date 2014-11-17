@@ -20,6 +20,7 @@ namespace frog
         {
             cmd_user_register = 1,
             cmd_server_register = 2,
+            cmd_server_to_user = 6,
             cmd_broadcast_user_login = 8,
             cmd_broadcast_user_logout = 9,
         };

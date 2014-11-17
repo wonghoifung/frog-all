@@ -11,17 +11,16 @@
 #include "linecmd_mgr.h"
 #include "global_holder.h"
 #include "string_utils.h"
+#include <boost/make_shared.hpp>
 
 namespace frog
 {
     namespace console
     {
         
-        console_server_handler::console_server_handler():tcpclient_(global_io_service.get())
+        console_server_handler::console_server_handler()
         {
             clear_stat();
-	    clienthandler_.set_console(this);
-	    clienthandler_.installcb(tcpclient_);
 
             generic::linecmd_mgr::ref().addlcmd("console_stat",
                                                 boost::bind(&console_server_handler::lcmd_console_stat,
@@ -29,8 +28,11 @@ namespace frog
             generic::linecmd_mgr::ref().addlcmd("console_clear",
                                                 boost::bind(&console_server_handler::lcmd_console_clear,
                                                             this, _1, _2));
-            generic::linecmd_mgr::ref().addlcmd("setuid",
-                                                boost::bind(&console_server_handler::lcmd_setuid,
+            generic::linecmd_mgr::ref().addlcmd("adduser",
+                                                boost::bind(&console_server_handler::lcmd_adduser,
+                                                            this, _1, _2));
+            generic::linecmd_mgr::ref().addlcmd("deluser",
+                                                boost::bind(&console_server_handler::lcmd_deluser,
                                                             this, _1, _2));
             generic::linecmd_mgr::ref().addlcmd("register",
                                                 boost::bind(&console_server_handler::lcmd_register,
@@ -62,6 +64,7 @@ namespace frog
             ss << "console close count : " << closecount_ << std::endl;
             ss << "console timeout count : " << timeoutcount_ << std::endl;
             ss << "console error count : " << errorcount_ << std::endl;
+	    ss << "user count : " << users_.size() << std::endl;
             session->send_line(ss.str().c_str(), (int)ss.str().size());
         }
         
@@ -70,232 +73,353 @@ namespace frog
             clear_stat();
         }
         
-        void console_server_handler::lcmd_setuid(std::vector<std::string>& argv,generic::tcpsession_ptr session)
+        void console_server_handler::lcmd_adduser(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    static bool alreadyset = false;
-	    if(alreadyset)
-     	    {
-		std::stringstream ss;
-                ss << "cannt set userid again, userid:" << global_user.get().id << std::endl;
-		session->send_line(ss.str().c_str(), (int)ss.str().size());
-	    	return;
-	    }
-
 	    std::stringstream ss;
             if(argv.size()!=1)
 	    {
-                ss << "usage: setuid <USERID>" << std::endl;
+                ss << "usage: adduser <USERID>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    global_user.get().id = frog::utils::string_to_number<int>(argv[0]);
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
 
-	    ss << "set userid to " << global_user.get().id << std::endl;
+	    if(users_.find(userid)!=users_.end())
+     	    {
+                ss << "cannot adduser repeatedly, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+	    	return;
+	    }
+	    
+	    users_[userid].id = userid;
+	    users_[userid].tcpclient = boost::make_shared<frog::generic::tcpclient>(boost::ref(global_io_service.get()));
+	    users_[userid].clienthandler = boost::make_shared<frog::generic::proxy_client_handler>(userid);
+	    users_[userid].clienthandler->set_console(this);
+	    users_[userid].clienthandler->installcb(*(users_[userid].tcpclient));
+	    
+	    ss << "adduser " << userid << " successfully" << std::endl;
 	    session->send_line(ss.str().c_str(), (int)ss.str().size());
+	}
 
-	    alreadyset = true;
+        void console_server_handler::lcmd_deluser(std::vector<std::string>& argv,generic::tcpsession_ptr session)
+	{
+	    std::stringstream ss;
+            if(argv.size()!=1)
+	    {
+                ss << "usage: deluser <USERID>" << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(user)
+	    {
+		if(user->clienthandler->is_connected())
+		{
+		    user->tcpclient->close();
+		}
+		users_.erase(userid);
+	    }
+	    
+	    ss << "deluser " << userid << " successfully" << std::endl;
+	    session->send_line(ss.str().c_str(), (int)ss.str().size());
 	}
 
         void console_server_handler::lcmd_register(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    if(!clienthandler_.is_connected()) 
+            if(argv.size()!=1)
 	    {
-		std::stringstream ss;
-		ss << "tcpclient not connected" << std::endl;
+	        std::stringstream ss;
+                ss << "usage: register <USERID>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(clienthandler_.is_registered())
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(!user)
+	    {
+	 	std::stringstream ss;
+		ss << "adduser first, not found userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_connected()) 
 	    {
 		std::stringstream ss;
-		ss << "already registered" << std::endl;
+		ss << "tcpclient not connected, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(user->clienthandler->is_registered())
+	    {
+		std::stringstream ss;
+		ss << "already registered, userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
             frog::generic::encoder out;
             out.begin(cmd_user_register);
-            out.write_int(global_user.get().id);
+            out.write_int(userid);
             out.end();
-            clienthandler_.session()->send(&out);
+            user->clienthandler->session()->send(&out);
 	}
 
         void console_server_handler::lcmd_connectproxy(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    if(clienthandler_.is_connected()) 
+            if(argv.size()!=1)
 	    {
-		std::stringstream ss;
-		ss << "already connected" << std::endl;
+	        std::stringstream ss;
+                ss << "usage: connectproxy <USERID>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
-	    tcpclient_.connect("127.0.0.1", "8888");
+
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(!user)
+	    {
+	 	std::stringstream ss;
+		ss << "adduser first, not found userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(user->clienthandler->is_connected()) 
+	    {
+		std::stringstream ss;
+		ss << "already connected, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+	    user->tcpclient->connect("127.0.0.1", "8888");
 	}
 
         void console_server_handler::lcmd_chatbroadcast(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    if(!clienthandler_.is_connected()) 
+            if(argv.size()!=2)
 	    {
-		std::stringstream ss;
-		ss << "tcpclient not connected" << std::endl;
+	        std::stringstream ss;
+                ss << "usage: chatbroadcast <USERID> <CONTENT>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(!clienthandler_.is_registered())
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(!user)
 	    {
-		std::stringstream ss;
-		ss << "register first" << std::endl;
+	 	std::stringstream ss;
+		ss << "adduser first, not found userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(argv.size() != 1)
+	    if(!user->clienthandler->is_connected()) 
 	    {
 		std::stringstream ss;
-                ss << "usage: chatbroadcast <CONTENT>" << std::endl;
+		ss << "tcpclient not connected, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_registered())
+	    {
+		std::stringstream ss;
+		ss << "register first, userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
             generic::encoder op;
             op.begin(cmd_user_broadcast);
-            op.write_int(global_user.get().id);
-            op.write_string(argv[0]);
+            op.write_int(userid);
+            op.write_string(argv[1]);
             op.end();
-            clienthandler_.session()->send(&op);
+            user->clienthandler->session()->send(&op);
 	}
 
         void console_server_handler::lcmd_sendmail(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    if(!clienthandler_.is_connected()) 
+            if(argv.size()!=5)
 	    {
-		std::stringstream ss;
-		ss << "tcpclient not connected" << std::endl;
+	        std::stringstream ss;
+                ss << "usage: sendmail <USERID> <TO_USERID> <TITLE> <CONTENT> <ATTACHMENT>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(!clienthandler_.is_registered())
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(!user)
+	    {
+	 	std::stringstream ss;
+		ss << "adduser first, not found userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_connected()) 
 	    {
 		std::stringstream ss;
-		ss << "register first" << std::endl;
+		ss << "tcpclient not connected, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_registered())
+	    {
+		std::stringstream ss;
+		ss << "register first, userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 	    
-	    if(argv.size() != 4)
-	    {
-		std::stringstream ss;
-                ss << "usage: sendmail <TO_USERID> <TITLE> <CONTENT> <ATTACHMENT>" << std::endl;
-		session->send_line(ss.str().c_str(), (int)ss.str().size());
-		return;
-	    }
- 
 	    frog::generic::encoder op;
 	    op.begin(cmd_user_send_mail);
-	    op.write_int(global_user.get().id);
-            op.write_int(frog::utils::string_to_number<int>(argv[0]));
-	    op.write_string(argv[1]);
+	    op.write_int(userid);
+            op.write_int(frog::utils::string_to_number<int>(argv[1]));
 	    op.write_string(argv[2]);
 	    op.write_string(argv[3]);
+	    op.write_string(argv[4]);
             op.end();
-            clienthandler_.session()->send(&op);
+            user->clienthandler->session()->send(&op);
 	}
 
         void console_server_handler::lcmd_listmail(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    if(!clienthandler_.is_connected()) 
+            if(argv.size()!=1)
 	    {
-		std::stringstream ss;
-		ss << "tcpclient not connected" << std::endl;
+	        std::stringstream ss;
+                ss << "usage: listmail <USERID>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(!clienthandler_.is_registered())
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(!user)
+	    {
+	 	std::stringstream ss;
+		ss << "adduser first, not found userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_connected()) 
 	    {
 		std::stringstream ss;
-		ss << "register first" << std::endl;
+		ss << "tcpclient not connected, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_registered())
+	    {
+		std::stringstream ss;
+		ss << "register first, userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
 	    frog::generic::encoder op;
 	    op.begin(cmd_user_get_all_mail_brief);
-	    op.write_int(global_user.get().id);
+	    op.write_int(userid);
 	    op.end();
-	    clienthandler_.session()->send(&op);
+	    user->clienthandler->session()->send(&op);
 	}
 
         void console_server_handler::lcmd_checkmail(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    if(!clienthandler_.is_connected()) 
+            if(argv.size()!=2)
 	    {
-		std::stringstream ss;
-		ss << "tcpclient not connected" << std::endl;
+	        std::stringstream ss;
+                ss << "usage: checkmail <USERID> <MAILID>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(!clienthandler_.is_registered())
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(!user)
 	    {
-		std::stringstream ss;
-		ss << "register first" << std::endl;
+	 	std::stringstream ss;
+		ss << "adduser first, not found userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(argv.size() != 1)
+	    if(!user->clienthandler->is_connected()) 
 	    {
 		std::stringstream ss;
-                ss << "usage: checkmail <MAILID>" << std::endl;
+		ss << "tcpclient not connected, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_registered())
+	    {
+		std::stringstream ss;
+		ss << "register first, userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
 	    frog::generic::encoder op;
 	    op.begin(cmd_user_get_mail_detail);
-	    op.write_int(global_user.get().id);
-	    op.write_int(frog::utils::string_to_number<int>(argv[0]));
+	    op.write_int(userid);
+	    op.write_int(frog::utils::string_to_number<int>(argv[1]));
 	    op.end();
-	    clienthandler_.session()->send(&op);
+	    user->clienthandler->session()->send(&op);
 	}
 
         void console_server_handler::lcmd_deletemail(std::vector<std::string>& argv,generic::tcpsession_ptr session)
 	{
-	    if(!clienthandler_.is_connected()) 
+            if(argv.size()!=2)
 	    {
-		std::stringstream ss;
-		ss << "tcpclient not connected" << std::endl;
+	        std::stringstream ss;
+                ss << "usage: deletemail <USERID> <MAILID>" << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(!clienthandler_.is_registered())
+	    int userid = frog::utils::string_to_number<int>(argv[0]);
+	    user* user = get_user(userid);
+	    if(!user)
 	    {
-		std::stringstream ss;
-		ss << "register first" << std::endl;
+	 	std::stringstream ss;
+		ss << "adduser first, not found userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
-	    if(argv.size() != 1)
+	    if(!user->clienthandler->is_connected()) 
 	    {
 		std::stringstream ss;
-                ss << "usage: deletemail <MAILID>" << std::endl;
+		ss << "tcpclient not connected, userid:" << userid << std::endl;
+		session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+
+	    if(!user->clienthandler->is_registered())
+	    {
+		std::stringstream ss;
+		ss << "register first, userid:" << userid << std::endl;
 		session->send_line(ss.str().c_str(), (int)ss.str().size());
 		return;
 	    }
 
 	    frog::generic::encoder op;
 	    op.begin(cmd_user_delete_mail);
-	    op.write_int(global_user.get().id);
-	    op.write_int(frog::utils::string_to_number<int>(argv[0]));
+	    op.write_int(userid);
+	    op.write_int(frog::utils::string_to_number<int>(argv[1]));
 	    op.end();
-	    clienthandler_.session()->send(&op);
+	    user->clienthandler->session()->send(&op);
 	}
 
         void console_server_handler::installcb(generic::tcpserver& s)
@@ -345,6 +469,13 @@ namespace frog
             errorcount_ = 0;
         }
         
+	console_server_handler::user* console_server_handler::get_user(int userid)
+	{
+	    std::map<int,user>::iterator it = users_.find(userid);
+	    if(it == users_.end()) return NULL;
+	    return &(it->second);
+	}
+
     }
 }
 

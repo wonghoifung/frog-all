@@ -9,6 +9,9 @@
 #include "console_server_handler.h"
 #include "logger.h"
 #include "linecmd_mgr.h"
+#include "chat_command.h"
+#include "global_holder.h"
+#include "proxy_client_handler.h"
 
 namespace frog
 {
@@ -23,6 +26,9 @@ namespace frog
                                                             this, _1, _2));
             generic::linecmd_mgr::ref().addlcmd("console_clear",
                                                 boost::bind(&console_server_handler::lcmd_console_clear,
+                                                            this, _1, _2));
+            generic::linecmd_mgr::ref().addlcmd("serverbroadcast",
+                                                boost::bind(&console_server_handler::lcmd_server_broadcast,
                                                             this, _1, _2));
         }
         
@@ -43,6 +49,24 @@ namespace frog
             clear_stat();
         }
         
+        void console_server_handler::lcmd_server_broadcast(std::vector<std::string>& argv,generic::tcpsession_ptr session)
+	{
+	    if(argv.size()!=1)
+	    {
+		std::stringstream ss;
+		ss << "usage: serverbroadcast <CONTENT>" << std::endl;
+            	session->send_line(ss.str().c_str(), (int)ss.str().size());
+		return;
+	    }
+	    frog::generic::encoder op;
+	    op.begin(chat::cmd_server_to_user);
+	    op.write_int(0);
+	    op.write_int(0);
+	    op.write_string(argv[0]);
+	    op.end();
+	    frog::utils::global_holder<frog::chat::proxy_client_handler>::ref().get().send(&op);
+	}
+
         void console_server_handler::installcb(generic::tcpserver& s)
         {
             s.set_closecb(boost::bind(&console_server_handler::on_close,this,_1));

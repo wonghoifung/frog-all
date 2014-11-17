@@ -64,6 +64,7 @@ namespace frog
         void proxy_client_handler::on_close(frog::generic::tcpsession_ptr session)
         {
             logstr("%s - %s closed", session->localaddr().c_str(), session->remoteaddr().c_str());
+	    session_ = frog::generic::tcpsession_ptr();
         }
         
         void proxy_client_handler::on_connect(frog::generic::tcpsession_ptr session)
@@ -76,6 +77,7 @@ namespace frog
                 out.write_int(config::ref().get_servertype());
                 out.end();
                 session->send(&out);
+	    	session_ = session;
             }
             else
             {
@@ -86,7 +88,13 @@ namespace frog
         void proxy_client_handler::on_error(frog::generic::tcpsession_ptr session, int errcode)
         {
             logstr("%s - %s error:%d", session->localaddr().c_str(), session->remoteaddr().c_str(), errcode);
+	    session_ = frog::generic::tcpsession_ptr();
         }
         
+	void proxy_client_handler::send(frog::generic::encoder* pack)
+	{
+	    if(session_) session_->send(pack);
+	}
+
     }
 }

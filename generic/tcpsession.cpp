@@ -39,7 +39,7 @@ namespace frog
         };
 
 #if _WIN32
-		tcpsession::tcpsession(boost::asio::io_service& io_service, tcpsession_type stype, parser_type ptype)
+	tcpsession::tcpsession(boost::asio::io_service& io_service, tcpsession_type stype, parser_type ptype)
             : socket_(io_service),
 #else
         tcpsession::tcpsession(const boost::asio::io_service& io_service, const tcpsession_type stype, const parser_type ptype)

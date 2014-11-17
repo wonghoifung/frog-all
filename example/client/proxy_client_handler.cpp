@@ -14,7 +14,7 @@ namespace frog
 	namespace generic
 	{
 
-		proxy_client_handler::proxy_client_handler():connected_(false),registered_(false),console_(NULL)
+		proxy_client_handler::proxy_client_handler(int userid):userid_(userid),connected_(false),registered_(false),console_(NULL)
 		{
 		}
 
@@ -87,7 +87,7 @@ namespace frog
 		void proxy_client_handler::on_close(frog::generic::tcpsession_ptr session)
 		{
 			clear_connect_state();
-			std::cout << session->localaddr() << " - " << session->remoteaddr() << " closed" << std::endl;
+			std::cout << userid_ << ":" << session->localaddr() << " - " << session->remoteaddr() << " closed" << std::endl;
 		}
 
 		void proxy_client_handler::on_connect(frog::generic::tcpsession_ptr session)
@@ -100,14 +100,14 @@ namespace frog
 			}
 			else
 			{
-				std::cout << "cannot connect" << std::endl;
+				std::cout << userid_ << ": cannot connect" << std::endl;
 			}
 		}
 
 		void proxy_client_handler::on_error(frog::generic::tcpsession_ptr session, int errcode)
 		{
 			clear_connect_state();
-			std::cout << session->localaddr() << " - "  << session->remoteaddr() << " error:" << errcode << std::endl;
+			std::cout << userid_ << ":" << session->localaddr() << " - "  << session->remoteaddr() << " error:" << errcode << std::endl;
 		}
 
 		void proxy_client_handler::handle_register(frog::generic::tcpsession_ptr session, frog::generic::decoder* pack)
@@ -133,27 +133,32 @@ namespace frog
 
 		void proxy_client_handler::handle_force_quit(frog::generic::tcpsession_ptr session, frog::generic::decoder* pack)
 		{
-			// TODO
+			int reason = pack->read_int();
 			std::stringstream ss;
-			ss << "force quit" << std::endl;
+			ss << "force quit, userid:" << userid_ << ", reason:" << reason << std::endl;
 			console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 			console_->linesession()->send_prompt();
 		}
 
 		void proxy_client_handler::handle_server_to_user(frog::generic::tcpsession_ptr session, frog::generic::decoder* pack)
 		{
-			// TODO
+			int tag = pack->read_int(); 
+			int subcmd = pack->read_int();
 			std::stringstream ss;
-			ss << "server to user" << std::endl;
+			ss << "server to user, userid:" << userid_ << ",tag:" << tag << std::endl;
+			if(subcmd==0)
+			{
+				std::string serverbroadcast = pack->read_cstring();
+				ss << "server broadcast: " << serverbroadcast << std::endl;
+			}	
 			console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 			console_->linesession()->send_prompt();
 		}
 
 		void proxy_client_handler::handle_no_service_found(frog::generic::tcpsession_ptr session, frog::generic::decoder* pack)
 		{
-			// TODO
 			std::stringstream ss;
-			ss << "no service found" << std::endl;
+			ss << "no service found, userid:" << userid_ << std::endl;
 			console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 			console_->linesession()->send_prompt();
 		}
@@ -165,6 +170,7 @@ namespace frog
 			std::string statement = pack->read_cstring();
 
 			std::stringstream ss;
+			ss << "this is " << userid_ << std::endl;
 			ss << "tag: " << tag << std::endl;
 			ss << userid << " say: " << statement << std::endl;
 			console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
@@ -180,6 +186,7 @@ namespace frog
 			{
 				std::stringstream ss;
 				ss << std::endl;
+				ss << "this is " << userid_ << std::endl;
 				int size = pack->read_int();
 				for(int i=0; i<size; ++i)
 				{
@@ -203,6 +210,7 @@ namespace frog
 			else if(ret == 1)
 			{
 				std::stringstream ss;
+				ss << "this is " << userid_ << std::endl;
 				ss << "cannot get all mail brief" << std::endl;
 				console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 				console_->linesession()->send_prompt();
@@ -210,6 +218,7 @@ namespace frog
 			else
 			{
 				std::stringstream ss;
+				ss << "this is " << userid_ << std::endl;
 				ss << "cannot get all mail brief, unknown ret:" << ret << std::endl;
 				console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 				console_->linesession()->send_prompt();
@@ -222,6 +231,7 @@ namespace frog
 			(void)userid;
 			int ret = pack->read_short();
 			std::stringstream ss;
+			ss << "this is " << userid_ << std::endl;
 			ss << "send mail " << (ret==0?"success, ret:":"failure, ret:") << ret << std::endl;
 			console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 			console_->linesession()->send_prompt();
@@ -233,6 +243,7 @@ namespace frog
 			(void)userid;
 			int ret = pack->read_short();
 			std::stringstream ss;
+			ss << "this is " << userid_ << std::endl;
 			ss << "delete mail " << (ret==0?"success, ret:":"failure, ret:") << ret << std::endl;
 			console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 			console_->linesession()->send_prompt();
@@ -244,6 +255,7 @@ namespace frog
 			(void)userid;
 			int ret = pack->read_short();
 			std::stringstream ss;
+			ss << "this is " << userid_ << std::endl;
 			ss << "get mail detail " << (ret==0?"success, ret:":"failure, ret:") << ret << std::endl;
 			if(ret==0)
 			{
@@ -268,6 +280,7 @@ namespace frog
 			int from = pack->read_int();
 			std::string title = pack->read_cstring();
 			std::stringstream ss;
+			ss << "this is " << userid_ << std::endl;
 			ss << "mail alert, from:" << from << ", to:" << to << ", title:" << title << std::endl;
 			console_->linesession()->send_line(ss.str().c_str(), (int)ss.str().size());
 			console_->linesession()->send_prompt();
