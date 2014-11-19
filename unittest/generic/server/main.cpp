@@ -24,6 +24,7 @@ int main(int argc, char* argv[])
         gserver.run();
         
 	frog::generic::tcpserver consoleserver(io_service, 9877, frog::generic::parse_line);
+	/* FIXME should use different handler class */
         frog::generic::generic_server_handler consolehandler;
         consolehandler.installcb(consoleserver);
         consoleserver.run();
