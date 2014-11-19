@@ -1,24 +1,23 @@
 #include "dboperator.h"
 #include <stdio.h>
 
-#if 0
 using namespace frog::db;
 
 /*
 
-CREATE TABLE `t1` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(200) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1
+   CREATE TABLE `t1` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `name` varchar(200) NOT NULL,
+   PRIMARY KEY (`id`)
+   ) ENGINE=MyISAM AUTO_INCREMENT=8 DEFAULT CHARSET=latin1
 
-CREATE TABLE `t2` (
-  `id` int(11) NOT NULL AUTO_INCREMENT,
-  `name` varchar(200) NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8
+   CREATE TABLE `t2` (
+   `id` int(11) NOT NULL AUTO_INCREMENT,
+   `name` varchar(200) NOT NULL,
+   PRIMARY KEY (`id`)
+   ) ENGINE=InnoDB AUTO_INCREMENT=8 DEFAULT CHARSET=utf8
 
-*/
+ */
 void print_dataset(dataset* ds)
 {
 	std::cout << "----------" << std::endl;
@@ -33,35 +32,37 @@ void print_dataset(dataset* ds)
 
 int main()
 {
-    // postgresql
-    conn_args_t connargs = {"127.0.0.1","5432","postgres","","test"};
-    //const char* selectallsql1 = "SELECT * FROM t1;";
-    const char* selectallsql2 = "SELECT * FROM t2;";
-    dboperator oper(e_postgre);
-    
-    // mysql
+	// postgresql
+	//conn_args_t connargs = {"127.0.0.1","5432","postgres","","test"};
+	//const char* selectallsql1 = "SELECT * FROM t1;";
+	//const char* selectallsql2 = "SELECT * FROM t2;";
+	//dboperator oper(e_postgre);
+
+	// mysql
 	//conn_args_t connargs = {"127.0.0.1","3306","root","123123","test"};
-    //conn_args_t connargs = {"192.168.100.170","3388","root","123123","test"};
-	//const char* selectallsql1 = "SELECT * FROM test.t1;";//MyISAM
+	conn_args_t connargs = {"192.168.100.170","3388","root","123123","test"};
+	const char* selectallsql1 = "SELECT * FROM test.t1;";//MyISAM
 	//const char* selectallsql2 = "SELECT * FROM test.t2;";//InnoDB
-	//dboperator oper(e_mysql);
-    
+	dboperator oper(e_mysql);
+
 	if (!oper.connect(connargs))
 	{ std::cout << "connect db failed" << std::endl; }
+	
+	print_dataset(oper.query(selectallsql1));
 
 #if 0
 	if (!oper.execute("INSERT INTO t1(id,name) VALUES(5,'wong');"))
 	{ std::cout << "insert db failed" << std::endl; }
-	
+
 	print_dataset(oper.query(selectallsql1));
-    
+
 	if (!oper.execute("UPDATE t1 SET name = 'hoi' WHERE id=5"))
 	{ std::cout << "update db failed" << std::endl; }
-    
-    print_dataset(oper.query(selectallsql1));
+
+	print_dataset(oper.query(selectallsql1));
 #endif
-    
-#define TEST_TRANSACTION
+
+//#define TEST_TRANSACTION
 #ifdef TEST_TRANSACTION
 	print_dataset(oper.query(selectallsql2));
 
@@ -70,16 +71,16 @@ int main()
 	{
 		std::cout << "start_transaction failed" << std::endl;
 		//goto FINALLY;
-        return 0;
+		return 0;
 	}
 
 	if (!oper.execute("UPDATE t2 SET name = 'hoi' WHERE id=5"))
 	{
 		std::cout << "update db failed" << std::endl;
 		//goto FINALLY;
-        return 0;
+		return 0;
 	}
-	
+
 	char c(0);
 	std::cout << "Commit or Rollback" << std::endl;
 	std::cin >> c;
@@ -103,7 +104,7 @@ int main()
 			goto FINALLY;
 		}
 	}
-	
+
 	if (!oper.stop_transaction())
 	{
 		std::cout << "stop_transaction failed" << std::endl;
@@ -124,4 +125,4 @@ FINALLY:
 
 	return 0;
 }
-#endif
+

@@ -6,7 +6,6 @@
 //  Copyright (c) 2014年 wonghoifung. All rights reserved.
 //
 
-#if 0
 
 #ifndef config_header
 #define config_header
@@ -63,4 +62,3 @@ namespace frog
 
 #endif 
 
-#endif

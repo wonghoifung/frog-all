@@ -1,12 +1,9 @@
 #include <iostream>
 #include "config.h"
 
-#if 0
-
 int  main()
 {
-	//const char* cfgfile = "D:/UserProfiles/AlbertHuang/Desktop/frog/example/frog_cfg/frog_cfg.xml";
-    const char* cfgfile = "/Users/huanghaifeng/Desktop/frog/config/frog_cfg.xml";
+    const char* cfgfile = "/home/AlbertHuang/frog-all/unittest/config/frog_cfg.xml";
     
     frog::utils::config& globalcfg = frog::utils::config::ref();
     if (globalcfg.init(cfgfile))
@@ -16,7 +13,7 @@ int  main()
         std::cout << "ip: " << globalcfg.get_ip() << std::endl;
         std::cout << "name: " << globalcfg.get_name() << std::endl;
         std::vector<std::string>& urls = globalcfg.get_urls();
-        for (int i=0; i<urls.size(); ++i)
+        for (unsigned int i=0; i<urls.size(); ++i)
         {
             std::cout << i << " url: " << urls[i] << std::endl;
         }
@@ -25,7 +22,7 @@ int  main()
         
         std::cout << "img id: " << globalcfg.get_imgid() << std::endl;
         std::vector<std::string>& imgs = globalcfg.get_imgs();
-        for (int i=0; i<imgs.size(); ++i)
+        for (unsigned int i=0; i<imgs.size(); ++i)
         {
             std::cout << i << " img: " << imgs[i] << std::endl;
         }
@@ -40,4 +37,3 @@ int  main()
     return 0;
 }
 
-#endif

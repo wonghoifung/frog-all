@@ -6,8 +6,6 @@
 //  Copyright (c) 2014年 wonghoifung. All rights reserved.
 //
 
-#if 0
-
 #include "config.h"
 #include <fstream>
 #include <boost/property_tree/ptree.hpp>
@@ -95,7 +93,7 @@ namespace frog
             //std::string str = "{\"id\":0,\"images\":[{\"url\":\"img/cat.jpg\"},{\"url\":\"img/dog.jpg\"}]}";
             
             std::string str;
-            std::fstream f("/Users/huanghaifeng/Desktop/frog/config/example.json");
+            std::fstream f("/home/AlbertHuang/frog-all/unittest/config/example.json");
             while (f)
             {
                 std::string line;
@@ -184,5 +182,4 @@ namespace frog
     }
 }
 
-#endif
 

@@ -11,15 +11,21 @@ else
 endif 
 
 CPPFLAGS += -DTIXML_USE_STL -Wall
-CPPFLAGS += -I../../ 
-CPPFLAGS += -I../../../boost_1_53_0/include  
+CPPFLAGS += -I../../../../boost_1_53_0/include  
+CPPFLAGS += -I../../../generic
+CPPFLAGS += -I../../../cache 
+CPPFLAGS += -I../../../db
+CPPFLAGS += -I../../../utils
+CPPFLAGS += -I../../../
 
-LIBS = -lboost_filesystem -lboost_date_time -lboost_system -lrt -lfrog
+LIBS = -lboost_thread -lboost_date_time -lboost_system -lrt -lmysqlclient -lpq -lfrog_all
 LINKFLAGS = -L/usr/local/lib 
-LINKFLAGS += -L../../../boost_1_53_0/lib
-LINKFLAGS += -L../../ 
+LINKFLAGS += -L../../../../boost_1_53_0/lib 
+LINKFLAGS += -L../../../../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/lib/ 
+LINKFLAGS += -L../../../../postgresql-9.3.5/lib/
+LINKFLAGS += -L../../../
 
-INCLUDEDIRS = ./ ../../utils/ ../../generic/ 
+INCLUDEDIRS = ./  
 INCLUDES = $(foreach tmp, $(INCLUDEDIRS), -I $(tmp))
 
 MYSOURCEDIRS = ./
