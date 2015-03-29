@@ -40,13 +40,17 @@ public:
     void call_func(const char* fname); 
     std::string call_func(const char* fname, const char* arg1, const char* arg2);
 
-    void export_func(const char* fname, int (*f)(lua_State*)); 
-
     lua_State* get_lua_state();
 
 private:
     lua_State* L;
 };
+
+template <typename T>
+void lua_pushpointer(lua_State* L, T* p) {
+    T** ud=(T**)lua_newuserdata(L,sizeof(T*));
+    *ud = p;
+}
 
 #endif
 

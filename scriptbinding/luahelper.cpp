@@ -135,11 +135,6 @@ std::string luahelper::call_func(const char* fname,
     return ret;
 }
 
-void luahelper::export_func(const char* fname, int (*f)(lua_State*))
-{
-    lua_register(L,fname,f);
-}
-
 lua_State* luahelper::get_lua_state()
 {
     return L;

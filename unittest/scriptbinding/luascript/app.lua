@@ -61,7 +61,7 @@ local function runloop()
         else
             print("nothing received")
         end
-        sleep(1)
+        --sleep(1)
     end
 end
 

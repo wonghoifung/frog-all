@@ -6,7 +6,79 @@
 //  Copyright (c) 2015 wonghoifung. All rights reserved.
 //
 
+enum {
+    cmd_login = 1,
+    cmd_logout = 2,
+    cmd_client_say = 3,
+};
+
 #if 1
+#include "luathread.h"
+
+using std::cout;
+using std::endl;
+using frog::utils::luathread;
+
+NETInputPacket* fakemessage(int cmd, int mid) {
+    NETOutputPacket out;
+    switch (cmd) {
+        case cmd_login:
+        {
+            out.Begin(cmd_login);
+            out.WriteInt(mid);
+            out.WriteString("albert");//pwd
+            out.End();
+            break;
+        }
+        case cmd_logout:
+        {
+            out.Begin(cmd_logout);
+            out.WriteInt(mid);
+            out.End();
+            break;
+        }
+        case cmd_client_say:
+        {
+            out.Begin(cmd_client_say);
+            out.WriteInt(mid);
+            out.WriteString("hello universe");
+            out.End();
+            break;
+        }
+        default:
+            assert(false);
+            return NULL;
+    }
+    NETInputPacket* in = new NETInputPacket();
+    in->Copy(out.packet_buf(), out.packet_size());
+    return in;
+}
+
+int main(int argc, const char * argv[]) {
+
+    luathread t;
+    t.init();
+
+    t.pushmsg(fakemessage(cmd_login, 1));
+    t.pushmsg(fakemessage(cmd_login, 2));
+    t.pushmsg(fakemessage(cmd_login, 3));
+    
+    t.pushmsg(fakemessage(cmd_client_say, 3));
+    t.pushmsg(fakemessage(cmd_client_say, 2));
+    t.pushmsg(fakemessage(cmd_client_say, 1));
+    
+    t.pushmsg(fakemessage(cmd_logout, 2));
+    t.pushmsg(fakemessage(cmd_logout, 1));
+    t.pushmsg(fakemessage(cmd_logout, 3));
+
+
+    t.join();
+    return 0;
+}
+
+#endif
+
+#if 0
 #include <iostream>
 #include <sstream>
 #include <list>
@@ -18,12 +90,6 @@ using std::cout;
 using std::endl;
 
 std::list<NETInputPacket*> msgqueue;
-
-enum {
-    cmd_login = 1,
-    cmd_logout = 2,
-    cmd_client_say = 3,
-};
 
 NETInputPacket* fakemessage(int cmd, int mid) {
     NETOutputPacket out;
@@ -98,11 +164,11 @@ int luasleep(lua_State* L) {
 
 int main(int argc, const char * argv[]) {
     luahelper lh;
-
-    lh.export_func("getmsg", getmsg);
-    lh.export_func("sleep", luasleep);
-    
     lua_State* L = lh.get_lua_state();
+
+    lua_register(L, "getmsg", getmsg);
+    lua_register(L, "sleep", luasleep);
+    
     luaport<lua_inpack>::register_class(L, "NETInputPacket");
     luaport<lua_outpack>::register_class(L, "NETOutputPacket");
 
