@@ -88,21 +88,6 @@ end
 
 --print(getstr("a","b"))
 ----------------------------------------
-c=CTest()
-print("c.Add(1,2)==>"..c:Add(1,2))
---c.m_x=9
---print("c.m_x==>"..c.m_x)
-c:setx(9)
-print("c.m_x==>"..c:getx())
-
-d=CTest()
---d.m_x=123
---print("d.m_x==>"..d.m_x)
---print("c.m_x==>"..c.m_x)
-d:setx(123)
-print("d.m_x==>"..d:getx())
-print("c.m_x==>"..c:getx())
-----------------------------------------
 print("test PacketBase ================")
 
 outp=NETOutputPacket()

@@ -12,7 +12,6 @@
 #include <list>
 #include <assert.h>
 #include "luahelper.h"
-#include "CTestAdapter.h"
 #include "PacketBaseAdapter.h"
 
 using std::cout;
@@ -104,7 +103,6 @@ int main(int argc, const char * argv[]) {
     lh.export_func("sleep", luasleep);
     
     lua_State* L = lh.get_lua_state();
-    luaport<CTestAdapter>::register_class(L, "CTest");
     luaport<lua_inpack>::register_class(L, "NETInputPacket");
     luaport<lua_outpack>::register_class(L, "NETOutputPacket");
 
