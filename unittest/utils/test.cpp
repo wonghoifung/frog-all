@@ -6,6 +6,7 @@
 //  Copyright (c) 2014年 wonghoifung. All rights reserved.
 //
 
+#if 0
 #include <stdio.h>
 #include <iostream>
 #include <boost/asio.hpp>
@@ -35,6 +36,7 @@ int main()
     ioserv.run();
     return 0;
 }
+#endif
 
 #if 0
 #include "dbthread.h"

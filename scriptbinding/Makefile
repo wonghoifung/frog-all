@@ -1,4 +1,4 @@
-TARGET = test 
+TARGET = test
 
 PREFIX_BIN =
 
@@ -10,30 +10,20 @@ else
 	CPPFLAGS = -ggdb -O2 
 endif 
 
-CPPFLAGS += -DTIXML_USE_STL -Wall
-#CPPFLAGS += -I../../../boost_1_53_0/include  
-CPPFLAGS += -I/Users/wonghoifung/myenvironment/include/ 
-CPPFLAGS += -I../../generic
-CPPFLAGS += -I../../cache 
-CPPFLAGS += -I../../db
-CPPFLAGS += -I../../utils
-CPPFLAGS += -I../../scriptbinding
-CPPFLAGS += -I../../scriptbinding/luasrc
-CPPFLAGS += -I../../
+#CFLAGS += -DLUA_USE_MKSTEMP 
+CFLAGS += -DLUA_USE_POSIX
 
-#LIBS = -lboost_thread -lboost_date_time -lboost_system -lrt -lmysqlclient -lpq -lfrog_all
-LIBS = -lboost_thread -lboost_date_time -lboost_system -lmysqlclient -lpq -lfrog_all
-LINKFLAGS = -L/usr/local/lib 
-#LINKFLAGS += -L../../../boost_1_53_0/lib 
-LINKFLAGS += -L/Users/wonghoifung/myenvironment/lib/
-#LINKFLAGS += -L../../../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/lib/ 
-#LINKFLAGS += -L../../../postgresql-9.3.5/lib/
-LINKFLAGS += -L../../
+CPPFLAGS += -Wall -I../../../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/include/
+CPPFLAGS += -I../../../boost_1_53_0/include/ 
 
-INCLUDEDIRS = ./  
+LIBS = -lboost_thread -lboost_date_time -lboost_system -lmysqlclient -lcurl -lpthread -lrt
+LINKFLAGS = -L../../../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/lib/ -L/usr/local/lib 
+LINKFLAGS += -L../../../boost_1_53_0/lib/
+
+INCLUDEDIRS = ./ ./luasrc/
 INCLUDES = $(foreach tmp, $(INCLUDEDIRS), -I $(tmp))
 
-MYSOURCEDIRS = ./  
+MYSOURCEDIRS = ./ ./luasrc/
 
 SOURCEDIRS = $(MYSOURCEDIRS)
 
