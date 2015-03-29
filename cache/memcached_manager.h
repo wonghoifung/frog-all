@@ -13,8 +13,11 @@
 #include <string>
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
-#include <libmemcached/memcached.hpp>
-#include <libmemcached/exception.hpp>
+//#include <libmemcached/memcached.hpp>
+//#include <libmemcached/exception.hpp>
+/* yosemite */
+#include <libmemcached-1.0/memcached.hpp>
+#include <libmemcached-1.0/exception.hpp>
 
 namespace frog
 {

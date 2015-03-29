@@ -11,20 +11,29 @@ else
 endif 
 
 CPPFLAGS += -DTIXML_USE_STL -Wall 
-CPPFLAGS += -I../boost_1_53_0/include 
-CPPFLAGS += -I../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/include/
-CPPFLAGS += -I../postgresql-9.3.5/include/
 
-LIBS = -lboost_thread -lboost_date_time -lboost_system -lrt -lmysqlclient -lpq -lmemcached
+#CPPFLAGS += -I../boost_1_53_0/include
+CPPFLAGS += -I/Users/wonghoifung/myenvironment/include/ 
+#CPPFLAGS += -I../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/include/
+CPPFLAGS += -I/usr/local/include/mysql/
+#CPPFLAGS += -I../postgresql-9.3.5/include/
+CPPFLAGS += -I/usr/local/include/
+CPPFLAGS += -I/Users/wonghoifung/Desktop/libmemcached/1.0.18/include/
+
+#LIBS = -lboost_thread -lboost_date_time -lboost_system -lrt -lmysqlclient -lpq -lmemcached
+LIBS = -lboost_thread -lboost_date_time -lboost_system -lmysqlclient -lpq -lmemcached
 LINKFLAGS = -L/usr/local/lib 
-LINKFLAGS += -L../boost_1_53_0/lib 
-LINKFLAGS += -L../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/lib/
-LINKFLAGS += -L../postgresql-9.3.5/lib/
+#LINKFLAGS += -L../boost_1_53_0/lib 
+LINKFLAGS += -L/Users/wonghoifung/myenvironment/lib/
+#LINKFLAGS += -L../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/lib/
+LINKFLAGS += -L/usr/local/lib/
+#LINKFLAGS += -L../postgresql-9.3.5/lib/
+LINKFLAGS += -L/Users/wonghoifung/Desktop/libmemcached/1.0.18/lib/
 
-INCLUDEDIRS = ./ ./utils/ ./generic/ ./db/ ./cache/
+INCLUDEDIRS = ./ ./utils/ ./generic/ ./db/ ./cache/ ./scriptbinding/ ./scriptbinding/luasrc/
 INCLUDES = $(foreach tmp, $(INCLUDEDIRS), -I $(tmp))
 
-MYSOURCEDIRS = ./ ./utils/ ./generic/ ./db/ ./cache/
+MYSOURCEDIRS = ./ ./utils/ ./generic/ ./db/ ./cache/ ./scriptbinding/ ./scriptbinding/luasrc/
 
 SOURCEDIRS = $(MYSOURCEDIRS)
 
