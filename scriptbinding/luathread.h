@@ -22,6 +22,7 @@
 #include "latch.hpp"
 #include "mrmw_queue.hpp"
 #include "PacketBaseAdapter.h"
+#include "luahelper.h"
 
 namespace frog
 {
@@ -45,14 +46,19 @@ namespace frog
             
             //script should stop first before setstop(true) is called
             void setstop(bool s) {stop_=s;} 
-            
+           
+            void setmsgcnt(int cnt) {msgcnt_=cnt;}
+            int getmsgcnt() {return msgcnt_;}
+ 
         private:
             void run();
             
         private:
             boost::atomic_bool stop_;
+            boost::atomic_int msgcnt_;
             thread_ptr thread_;
             latch initdone_;
+            luahelper luahelp_;
             mrmw_queue<NETInputPacket*> packs_;
         };
         

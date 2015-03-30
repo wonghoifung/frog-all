@@ -9,6 +9,21 @@ local cmd_callbacks = {}
 
 local onlinemembers = {}
 
+local function get_memberinfo(mid)
+    for k,v in pairs(onlinemembers) do
+        if k==mid then
+            return v
+        end
+    end
+    return nil
+end
+
+function tablelength(T)
+  local count = 0
+  for _ in pairs(T) do count = count + 1 end
+  return count
+end
+
 local function handle_stoploop(msg)
     stop = true
 end
@@ -22,7 +37,12 @@ end
 
 local function handle_logout(msg)
     mid = msg:ReadInt()
-    print("handle_logout mid:"..mid)
+    info = get_memberinfo(mid)
+    if info==nil then
+        print("handle_logout mid:"..mid.." was not online")
+        return
+    end
+    print("handle_logout mid:"..mid..", info:"..info..", online left:"..tablelength(onlinemembers))
     for k,v in pairs(onlinemembers) do
         if k==mid then
             onlinemembers[k]=nil
@@ -32,8 +52,13 @@ end
 
 local function handle_client_say(msg)
     mid = msg:ReadInt()
+    info = get_memberinfo(mid)
+    if info==nil then
+        print("handle_client_say mid:"..mid.." was not online")
+        return
+    end
     content = msg:ReadString()
-    print("handle_client_say mid:"..mid.." say:"..content)
+    print("handle_client_say mid:"..mid.." info:"..info.." say:"..content..", online left:"..tablelength(onlinemembers))
 end
 
 local function init_callbacks()
@@ -51,26 +76,34 @@ local function dispatch_msg(msg)
 end
 
 local function dump_onlinemembers()
-    if #onlinemembers>0 then
+    --print("dump_onlinemembers----------------onlinemembers count:"..#onlinemembers)
+    if tablelength(onlinemembers)>0 then
+        print("") --empty line
         print("dump onlinemembers==========")
         for k,v in pairs(onlinemembers) do
             print("k:"..k..", v:"..v)
         end
         print("dump done===================")
+        print("") --empty line
     end
 end
 
+msgrecvcount = cppgetmsgcnt()
+
 local function runloop()
     while stop~=true do
-        dump_onlinemembers()
         msg = getmsg()
         if msg~=nil then
             dispatch_msg(msg)
+            msgrecvcount = msgrecvcount + 1
         else
             print("nothing received")
         end
+        print(">>>>>>>>> msg recv count: "..msgrecvcount)
+        --dump_onlinemembers()
         --sleep(1)
     end
+    cppsetmsgcnt(msgrecvcount)
 end
 
 init_callbacks()
@@ -97,24 +130,6 @@ end
 
 --print(getstr("a","b"))
 ----------------------------------------
-print("test PacketBase ================")
-
-outp=NETOutputPacket()
-outp:Begin(123)
-outp:WriteInt(789)
-outp:WriteShort(456)
-outp:WriteString("abcdefg hijk")
-outp:End()
-
-inp=NETInputPacket()
-inp:Copy(outp:packet_buf(),outp:packet_size())
-print("cmd:"..inp:GetCmdType())
-print("int:"..inp:ReadInt())
-print("short:"..inp:ReadShort())
-print("string:"..inp:ReadString())
-
-print("================================")
-----------------------------------------
 -- Meta class
 Shape = {area = 0}
 -- Base class method new
@@ -133,7 +148,7 @@ end
 
 -- Creating an object
 myshape = Shape:new(nil,10)
-myshape:printArea()
+--myshape:printArea()
 
 ----------------------------------------
 
@@ -154,6 +169,6 @@ end
 
 -- Creating an object
 myrectangle = Rectangle:new(nil,10,20)
-myrectangle:printArea()
+--myrectangle:printArea()
 
 ----------------------------------------

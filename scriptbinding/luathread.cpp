@@ -37,12 +37,31 @@ static int luasleep(lua_State* L) {
     return 0;
 }
 
+static int cppsetmsgcnt(lua_State* L) {
+    frog::utils::luathread* lt = (frog::utils::luathread*)lua_topointer(L, lua_upvalueindex(1));
+    if (lt) {
+        int mcnt = (int)lua_tonumber(L,-1);
+        lt->setmsgcnt(mcnt);
+    }
+    return 0;
+}
+
+static int cppgetmsgcnt(lua_State* L) {
+    frog::utils::luathread* lt = (frog::utils::luathread*)lua_topointer(L, lua_upvalueindex(1));
+    if (lt) {
+        int ret = lt->getmsgcnt();
+        lua_pushnumber(L,ret);
+        return 1;
+    }
+    return 0;
+}
+
 namespace frog
 {
     namespace utils
     {
        
-        luathread::luathread() : stop_(false),initdone_(1)
+        luathread::luathread() : stop_(false),msgcnt_(0),initdone_(1),luahelp_(true)
         {
         }
         
@@ -60,7 +79,10 @@ namespace frog
         void luathread::run()
         {
             while(!stop_) {
-                luahelper lh;
+                //luahelper lh;
+                luahelper& lh = luahelp_;
+                lh.init();
+
                 lua_State* L = lh.get_lua_state();
 
                 //lua_pushpointer(L, &packs_);
@@ -68,6 +90,14 @@ namespace frog
                 lua_pushcclosure(L, getmsg, 1);
                 lua_setglobal(L, "getmsg");
             
+                lua_pushlightuserdata(L, this);
+                lua_pushcclosure(L, cppsetmsgcnt, 1);
+                lua_setglobal(L, "cppsetmsgcnt");
+
+                lua_pushlightuserdata(L, this);
+                lua_pushcclosure(L, cppgetmsgcnt, 1);
+                lua_setglobal(L, "cppgetmsgcnt");
+
                 lua_register(L, "sleep", luasleep);
     
                 luaport<lua_inpack>::register_class(L, "NETInputPacket");
@@ -76,6 +106,8 @@ namespace frog
                 initdone_.done();
             
                 lh.bindfile("./luascript/app.lua");
+
+                lh.fini();
             }
         }
         

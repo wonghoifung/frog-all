@@ -66,7 +66,35 @@ int main(int argc, const char * argv[]) {
 
     luathread t;
     t.init();
+   
+    int startts = time(NULL); 
+    for(int i=0; i<10000; ++i){        
+        t.pushmsg(buildinpack(1,123,"pwd123"));
+        t.pushmsg(buildinpack(1,234,"pwd234"));
+        t.pushmsg(buildinpack(1,345,"pwd345"));
+ 
+        t.pushmsg(buildinpack(3,345,"content345"));
+        t.pushmsg(buildinpack(3,234,"content234"));
+        t.pushmsg(buildinpack(3,123,"content123"));
 
+        t.pushmsg(buildinpack(2,123));
+        t.pushmsg(buildinpack(2,234));
+        t.pushmsg(buildinpack(2,345));
+    
+        t.pushmsg(buildinpack(3,345,"content345"));
+        t.pushmsg(buildinpack(3,234,"content234"));
+        t.pushmsg(buildinpack(3,123,"content123"));
+    
+        t.pushmsg(buildinpack(0));
+    }
+
+    while(t.getmsgcnt()<130000) {
+        //...
+    }
+    int endts = time(NULL);
+    cout << "all done, cost " << (endts-startts) << " seconds" << endl;
+
+#if 0
     int cmd=-1;
     int mid=0;
     string info;
@@ -100,7 +128,7 @@ int main(int argc, const char * argv[]) {
         }
         if (cmd==999) break;
     }
-
+#endif
     t.join();
     return 0;
 }

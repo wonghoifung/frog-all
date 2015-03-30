@@ -9,14 +9,14 @@
 #include "luahelper.h"
 #include <assert.h>
 
-luahelper::luahelper():L(NULL)
+luahelper::luahelper(bool manualinit):L(NULL),manualinit_(manualinit)
 {
-   init(); 
+   if(!manualinit_)init(); 
 }
 
 luahelper::~luahelper()
 {
-    fini();
+    if(!manualinit_)fini();
 }
 
 bool luahelper::init()
@@ -133,6 +133,13 @@ std::string luahelper::call_func(const char* fname,
     }
     lua_pop(L,1);
     return ret;
+}
+
+void luahelper::call_func(const char* fname, int n)
+{
+    lua_getglobal(L,fname);
+    lua_pushnumber(L,n);
+    lua_call(L,1,0);
 }
 
 lua_State* luahelper::get_lua_state()

@@ -22,7 +22,7 @@ int dofile (lua_State *L, const char *name);
 class luahelper  : public boost::noncopyable
 {
 public:
-    luahelper();
+    luahelper(bool manualinit = false);
     ~luahelper();
     
     bool init();
@@ -39,11 +39,13 @@ public:
    
     void call_func(const char* fname); 
     std::string call_func(const char* fname, const char* arg1, const char* arg2);
+    void call_func(const char* fname, int n);
 
     lua_State* get_lua_state();
 
 private:
     lua_State* L;
+    bool manualinit_;
 };
 
 template <typename T>
