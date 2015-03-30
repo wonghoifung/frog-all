@@ -33,7 +33,7 @@ public:
     }
     int Copy(lua_State* L) {
         void* buf = *(void**)lua_topointer(L, 2);
-        int len = lua_tonumber(L, 3);
+        int len = (int)lua_tonumber(L, 3);
         bool ret = NETInputPacket::Copy(buf, len);
         lua_pushnumber(L, ret);
         return 1;
@@ -85,7 +85,7 @@ public:
         return 1;
     }
     int Begin(lua_State* L) {
-        short cmd = lua_tonumber(L, 2);
+        short cmd = (short)lua_tonumber(L, 2);
         NETOutputPacket::Begin(cmd);
         return 0;
     }

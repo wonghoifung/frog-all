@@ -18,6 +18,7 @@
 #endif
 #include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/atomic.hpp>
 #include "latch.hpp"
 #include "mrmw_queue.hpp"
 #include "PacketBaseAdapter.h"
@@ -42,10 +43,14 @@ namespace frog
             void join() { thread_->join(); }
             void pushmsg(NETInputPacket* pack);
             
+            //script should stop first before setstop(true) is called
+            void setstop(bool s) {stop_=s;} 
+            
         private:
             void run();
             
         private:
+            boost::atomic_bool stop_;
             thread_ptr thread_;
             latch initdone_;
             mrmw_queue<NETInputPacket*> packs_;

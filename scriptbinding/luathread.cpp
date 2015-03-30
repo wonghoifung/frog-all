@@ -42,7 +42,7 @@ namespace frog
     namespace utils
     {
        
-        luathread::luathread() : initdone_(1)
+        luathread::luathread() : stop_(false),initdone_(1)
         {
         }
         
@@ -59,22 +59,24 @@ namespace frog
        
         void luathread::run()
         {
-            luahelper lh;
-            lua_State* L = lh.get_lua_state();
+            while(!stop_) {
+                luahelper lh;
+                lua_State* L = lh.get_lua_state();
 
-            //lua_pushpointer(L, &packs_);
-            lua_pushlightuserdata(L, &packs_);
-            lua_pushcclosure(L, getmsg, 1);
-            lua_setglobal(L, "getmsg");
+                //lua_pushpointer(L, &packs_);
+                lua_pushlightuserdata(L, &packs_);
+                lua_pushcclosure(L, getmsg, 1);
+                lua_setglobal(L, "getmsg");
             
-            lua_register(L, "sleep", luasleep);
+                lua_register(L, "sleep", luasleep);
     
-            luaport<lua_inpack>::register_class(L, "NETInputPacket");
-            luaport<lua_outpack>::register_class(L, "NETOutputPacket");
+                luaport<lua_inpack>::register_class(L, "NETInputPacket");
+                luaport<lua_outpack>::register_class(L, "NETOutputPacket");
 
-            initdone_.done();
+                initdone_.done();
             
-            lh.bindfile("./luascript/app.lua");
+                lh.bindfile("./luascript/app.lua");
+            }
         }
         
     }

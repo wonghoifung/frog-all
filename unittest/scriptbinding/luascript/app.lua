@@ -1,10 +1,17 @@
+cmd_stoploop = 0
 cmd_login = 1
 cmd_logout = 2
 cmd_client_say = 3
 
+local stop = false
+
 local cmd_callbacks = {}
 
 local onlinemembers = {}
+
+local function handle_stoploop(msg)
+    stop = true
+end
 
 local function handle_login(msg)
     mid = msg:ReadInt()
@@ -30,6 +37,7 @@ local function handle_client_say(msg)
 end
 
 local function init_callbacks()
+    cmd_callbacks[cmd_stoploop] = handle_stoploop
     cmd_callbacks[cmd_login] = handle_login
     cmd_callbacks[cmd_logout] = handle_logout
     cmd_callbacks[cmd_client_say] = handle_client_say
@@ -53,7 +61,7 @@ local function dump_onlinemembers()
 end
 
 local function runloop()
-    while true do
+    while stop~=true do
         dump_onlinemembers()
         msg = getmsg()
         if msg~=nil then
@@ -66,8 +74,9 @@ local function runloop()
 end
 
 init_callbacks()
+print("loop start...")
 runloop()
-
+print("loop stop...")
 
 
 ----------------------------------------
