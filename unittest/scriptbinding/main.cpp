@@ -94,41 +94,6 @@ int main(int argc, const char * argv[]) {
     int endts = time(NULL);
     cout << "all done, cost " << (endts-startts) << " seconds" << endl;
 
-#if 0
-    int cmd=-1;
-    int mid=0;
-    string info;
-
-    while(cin>>cmd) {
-        switch(cmd) {
-        case cmd_stoploop:
-            t.pushmsg(buildinpack(cmd));
-            break;
-        case cmd_login:
-            cin>>mid;
-            cin>>info;
-            t.pushmsg(buildinpack(cmd,mid,info));
-            break;
-        case cmd_logout:
-            cin>>mid;
-            t.pushmsg(buildinpack(cmd,mid));
-            break;
-        case cmd_client_say:
-            cin>>mid;
-            cin>>info;
-            t.pushmsg(buildinpack(cmd,mid,info));
-            break;
-        case 999:
-            t.pushmsg(buildinpack(cmd_stoploop));
-            t.setstop(true);
-            break;
-        default:
-            cout << "error: cmd not valid" << endl;
-            break;
-        }
-        if (cmd==999) break;
-    }
-#endif
     t.join();
     return 0;
 }
