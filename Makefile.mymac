@@ -10,7 +10,8 @@ else
 	CPPFLAGS = -ggdb -O2 
 endif 
 
-CPPFLAGS += -DTIXML_USE_STL -Wall 
+#CPPFLAGS += -DTIXML_USE_STL -Wall 
+CPPFLAGS += -Wall 
 
 #where are boost and zmq header
 CPPFLAGS += -I/Users/wonghoifung/myenvironment/include/ 

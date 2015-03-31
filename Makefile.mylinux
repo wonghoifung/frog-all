@@ -10,7 +10,8 @@ else
 	CPPFLAGS = -ggdb -O2 
 endif 
 
-CPPFLAGS += -DTIXML_USE_STL -Wall 
+#CPPFLAGS += -DTIXML_USE_STL -Wall 
+CPPFLAGS += -Wall 
 
 CPPFLAGS += -I../boost_1_53_0/include
 CPPFLAGS += -I../mysql-connector-c-6.0.2-linux-glibc2.3-x86-64bit/include/

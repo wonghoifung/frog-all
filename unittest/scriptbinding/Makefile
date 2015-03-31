@@ -10,7 +10,8 @@ else
 	CPPFLAGS = -ggdb -O2 
 endif 
 
-CPPFLAGS += -DTIXML_USE_STL -Wall
+#CPPFLAGS += -DTIXML_USE_STL -Wall
+CPPFLAGS += -Wall
 CPPFLAGS += -I../../../boost_1_53_0/include  
 CPPFLAGS += -I../../generic
 CPPFLAGS += -I../../cache 
