@@ -8,3 +8,5 @@
 13. protobuf/thrift
 
 14. coroutine
+
+15. mongodb, redis binding
