@@ -10,3 +10,5 @@
 14. coroutine
 
 15. mongodb, redis binding
+
+16. async redis and db
