@@ -1,21 +1,13 @@
 frog-all
 =========
 
-A nonblocking single-threaded network framework based on Boost.Asio
+A nonblocking single-threaded network message dispatcher based on Boost.Asio
 
-frog-all is very easy to use, it is designed to build network programme in a fairly short time and in a really convenient way.
-
-frog-all provides a console for developers to inspect programme stat in runtime. 
-
-frog-all provides tcp session heartbeat checking.
-
-frog-all uses simple xdr instead of protobuf, it looks fresher and more flexable to manual control serialization when we don't need anything more complicated.
-
-frog-all probably is cross-platform because it depends on Boost to handle IO issues, it has been tested on windows/mac os x/linux.
-
-frog-all was inspired by my work experiences, as a server programmer, I was always asked to do my jobs effectively and respond to bugs quickly, so the code is much better to be wrote as simple as possible provided the performance is up to standard.
-
-Stress test case for the example server can be found in frog-erlang repos. Erlang is suitable to do stress testing because it can spawn thousands of processes easily and cost very little resouce.
+1. very easy to use
+2. console to inspect running status
+3. tcp session heartbeat checking
+4. cache manager
+5. db manager
 
 quick glance(full source code could be found in unittest folder)
 ================================================================
