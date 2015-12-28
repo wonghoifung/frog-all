@@ -28,8 +28,18 @@ makeInvestment(Ts&&... params)
 	return p;
 }
 
+class C
+{
+public: 
+	C(){cout<<"C"<<endl;}
+	~C(){cout<<"~C"<<endl;}
+};
+
 int main()
 {
 	auto p = makeInvestment();
+
+	unique_ptr<C[]> pc(new C[2]);
+
 	return 0;
 }
