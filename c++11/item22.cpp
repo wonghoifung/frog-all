@@ -37,19 +37,19 @@ struct sWidget::Impl {
 	std::vector<double> data;
 };
 
-sWidget::sWidget():pImpl(new Impl())
+sWidget::sWidget():pImpl(std::make_shared<Impl>())
 {
 
 }
 
 void sWidget::printName()
 {
-	if (!pImpl) std::cout<<"p null impl"<<std::endl;
+	if (!pImpl) {std::cout<<"p null impl"<<std::endl;return;}
 	std::cout<<pImpl->name<<std::endl;
 }
 
 void sWidget::setName(const char* n)
 {
-	if (!pImpl) std::cout<<"s null impl"<<std::endl;
+	if (!pImpl) {std::cout<<"s null impl"<<std::endl;return;}
 	pImpl->name=n;
 }
