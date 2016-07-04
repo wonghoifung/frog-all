@@ -5,6 +5,8 @@
 
 using namespace std;
 
+// 1
+
 int ciCharCompare(char c1, char c2) {
   int lc1 = tolower(static_cast<unsigned char>(c1));
   int lc2 = tolower(static_cast<unsigned char>(c2));
@@ -28,9 +30,20 @@ int ciStringCompare(const string& s1, const string& s2) {
   return -ciStringCompareImpl(s2, s1);
 }
 
+// 2
+
+bool ciCharLess(char c1, char c2) {
+  return tolower(static_cast<unsigned char>(c1)) < tolower(static_cast<unsigned char>(c2));
+}
+
+bool ciStringCompare2(const string& s1, const string& s2) {
+  return lexicographical_compare(s1.begin(), s1.end(), s2.begin(), s2.end(), ciCharLess);
+}
+
 int main() {
   string s1 = "HELLO";
   string s2 = "hello";
   cout << ciStringCompare(s1, s2) << endl;
+  cout << boolalpha << ciStringCompare2(s1, s2) << endl;
 }
 
