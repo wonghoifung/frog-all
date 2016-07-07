@@ -1,6 +1,7 @@
 #include <string>
 #include <iostream>
 #include <set>
+#include <algorithm>
 
 using namespace std;
 
@@ -27,4 +28,19 @@ int ciStringCompare(const string& s1, const string& s2) {
   return -ciStringCompareImpl(s2, s1);
 }
 
+struct CiStringCompare: public binary_function<string, string, bool> {
+  bool operator()(const string& lhs, const string& rhs) const {
+    return ciStringCompare(lhs, rhs);
+  }
+};
+
+int main() {
+  set<string, CiStringCompare> ciss;
+  ciss.insert("Persephone");
+  ciss.insert("persephone");
+  cout << ciss.size() << endl;
+  cout << *(ciss.begin()) << endl;
+  cout << boolalpha << (ciss.find("persephone") != ciss.end()) << endl;
+  cout << boolalpha << (find(ciss.begin(), ciss.end(), "persephone") != ciss.end()) << endl;
+}
 
