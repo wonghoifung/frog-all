@@ -13,7 +13,8 @@ public:
   const T denominator() const {return denominator_;}
   
   friend const Rational operator*(const Rational& lhs, const Rational& rhs) {
-    return Rational(lhs.numerator() * rhs.numerator(),
+  //friend const Rational<T> operator*(const Rational<T>& lhs, const Rational<T>& rhs) {
+    return Rational<T>(lhs.numerator() * rhs.numerator(),
                     lhs.denominator() * rhs.denominator());
   }
 };
